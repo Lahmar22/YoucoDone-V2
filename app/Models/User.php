@@ -9,10 +9,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     use HasApiTokens;
+    use HasRoles;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
@@ -29,7 +31,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id',
     ];
 
     /**
@@ -67,18 +68,18 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the role associated with the user.
-     */
-    public function role()
-    {
-        return $this->belongsTo(Role::class, 'role_id');
-    }
-
-    /**
      * Restaurants favorited by the user.
      */
     public function favoris()
     {
         return $this->belongsToMany(Restaurant::class, 'favoris', 'user_id', 'restaurant_id')->withTimestamps();
+    }
+
+    /**
+     * Reservations made by the user.
+     */
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
     }
 }
