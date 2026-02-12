@@ -97,7 +97,8 @@
                         <tr class="hover:bg-gray-50/50 transition">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <img src="{{ asset('storage/' . $restaurant->image) }}" class="w-12 h-12 rounded-xl object-cover bg-gray-100">
+                                    
+                                    <img src="{{ asset('storage/'.$restaurant->image) }}" class="w-12 h-12 rounded-xl object-cover bg-gray-100">
                                     <span class="font-bold text-brand-dark">{{ $restaurant->name }}</span>
                                 </div>
                             </td>
