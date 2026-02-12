@@ -7,6 +7,8 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\FavorisController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ReservationController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -37,7 +39,7 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        return view('auth.login');
     })->name('dashboard');
 });
 
@@ -62,16 +64,21 @@ Route::delete('menus/{menuId}/items/{itemId}', [MenuController::class, 'deleteIt
 Route::middleware('auth')->group(function () {
     Route::get('favorites', [FavorisController::class, 'index'])->name('favorites.index');
     Route::post('favorites/toggle/{restaurantId}', [FavorisController::class, 'toggle'])->name('favorites.toggle');
+
+    // Reservation Routes
+    Route::get('my-reservations', [ReservationController::class, 'index'])->name('reservations.index');
+    Route::post('reservations', [ReservationController::class, 'store'])->name('reservations.store');
 });
 
 
-Route::middleware('auth:admin')->group(function () {
-    Route::get('admin', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
-    Route::get('admin/profile', function () {
-        return view('admin.profile');
-    })->name('admin.profile');
 
-    Route::post('admin/logout', [LoginController::class, 'adminLogout'])->name('admin.logout');
-});
+Route::get('dashboard', function () {
+    return view('admin.dashboard');
+})->name('admin.dashboard');
+Route::get('admin/profile', function () {
+    return view('admin.profile');
+})->name('admin.profile');
+
+Route::get('admin/restaurants', [AdminController::class, 'restaurants'])->name('admin.restaurants');
+
+Route::post('admin/logout', [LoginController::class, 'adminLogout'])->name('admin.logout');
