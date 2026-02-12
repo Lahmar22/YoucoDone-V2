@@ -16,21 +16,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create roles
+        // Create Spatie roles
         $clientRole = Role::firstOrCreate([
-            'description' => 'client',
+            'name' => 'client',
+            'guard_name' => 'web',
         ]);
 
         $restaurateurRole = Role::firstOrCreate([
-            'description' => 'restaurateur',
+            'name' => 'restaurateur',
+            'guard_name' => 'web',
         ]);
 
         // User::factory(10)->create();
 
-        User::factory()->create([
+        $user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'role_id' => $clientRole->id,
         ]);
+        
+        // Assign client role to the test user
+        $user->assignRole($clientRole);
     }
 }
