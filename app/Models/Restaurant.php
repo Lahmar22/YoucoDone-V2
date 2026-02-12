@@ -24,4 +24,20 @@ class Restaurant extends Model
         return $this->belongsToMany(User::class, 'favoris', 'restaurant_id', 'user_id')->withTimestamps();
     }
 
+    /**
+     * Reservations made for this restaurant.
+     */
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    /**
+     * Menus available at this restaurant.
+     */
+    public function menus()
+    {
+        return $this->hasMany(Menu::class);
+    }
+
 }
