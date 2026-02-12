@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Admin;
-use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 
 class LoginController extends Controller
 {
@@ -31,12 +29,6 @@ class LoginController extends Controller
         }
 
        
-        $loginAsAdmin = $this->loginAdminByEmailPassword($email, $password);
-        if ($loginAsAdmin) {
-            return $loginAsAdmin;
-        }
-
-        
         return redirect()->back()->withErrors([
             'email' => 'Invalid email or password',
         ])->withInput($request->except('password'));
@@ -53,46 +45,22 @@ class LoginController extends Controller
             return null;
         }
 
-       
-        $role = $user->role;
-
-        if (!$role) {
-            return redirect()->back()->withErrors([
-                'email' => 'User role not assigned',
-            ])->withInput();
-        }
-
         
         Auth::login($user);
 
        
-        $roleDescription = strtolower($role->name);
-
-        if ($roleDescription === 'client') {
+        if ($user->hasRole('client')) {
             return redirect()->route('client.restaurants');
-        } elseif ($roleDescription === 'restaurateur') {
+        } elseif ($user->hasRole('restaurateur')) {
             return redirect()->route('restaurateur.myRestaurant');
+        } elseif ($user->hasRole('admin')) {
+            return redirect()->route('admin.dashboard');
         }
 
-        return redirect()->intended('welcome');
+        return redirect('/');
     }
 
     
-    private function loginAdminByEmailPassword($email, $password)
-    {
-        
-        $admin = Admin::where('email', $email)->first();
-
-        
-        if (!$admin || !Hash::check($password, $admin->password)) {
-            return null;
-        }
-
-        
-        Auth::guard('admin')->login($admin);
- 
-        return redirect()->route('admin.dashboard');
-    }
 
     
     public function logout(Request $request)
