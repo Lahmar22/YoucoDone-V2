@@ -20,7 +20,7 @@
             <h2 class="font-serif text-2xl font-bold text-brand-dark mb-6">YoucoDone Admin</h2>
             <nav class="space-y-2 text-sm">
                 <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded-md hover:bg-gray-50">Dashboard</a>
-                <a href="#" class="block px-3 py-2 rounded-md hover:bg-gray-50">Restaurants</a>
+                <a href="{{ route('admin.restaurants') }}" class="block px-3 py-2 rounded-md hover:bg-gray-50">Restaurants</a>
                 <a href="#" class="block px-3 py-2 rounded-md hover:bg-gray-50">Menus</a>
                 <a href="#" class="block px-3 py-2 rounded-md hover:bg-gray-50">Users</a>
             </nav>
@@ -38,8 +38,8 @@
                 <div class="flex items-center gap-4">
                     <div x-data="{ open: false }" class="relative">
                         <button @click.prevent="open = !open" class="inline-flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-50">
-                            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center font-semibold">{{ strtoupper(substr(auth('admin')->user()->name ?? 'A',0,1)) }}</div>
-                            <div class="text-sm text-gray-600">{{ auth('admin')->user()->name ?? 'Admin' }}</div>
+                            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center font-semibold">{{ strtoupper(substr(Auth::user()->name ?? 'A',0,1)) }}</div>
+                            <div class="text-sm text-gray-600">{{ Auth::user()->name }}</div>
                             <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400"></i>
                         </button>
 
