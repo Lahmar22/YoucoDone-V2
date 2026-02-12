@@ -30,16 +30,20 @@
             </div>
 
             <div class="mt-4">
-                <x-label for="role_id" value="{{ __('User Type') }}" />
+                <x-label for="role" value="{{ __('User Type') }}" />
                 <div class="mt-2 space-y-2">
-                    @foreach($roles as $role)
-                        <div class="flex items-center">
-                            <input id="role_{{ $role->id }}" type="radio" name="role_id" value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'checked' : '' }} required class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                            <label for="role_{{ $role->id }}" class="ms-2 text-sm font-medium text-gray-900">
-                                {{ __($role->name) }}
-                            </label>
-                        </div>
-                    @endforeach
+                    <div class="flex items-center">
+                        <input id="role_client" type="radio" name="role" value="client" {{ old('role') == 'client' ? 'checked' : '' }} required class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <label for="role_client" class="ms-2 text-sm font-medium text-gray-900">
+                            {{ __('Client') }}
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="role_restaurateur" type="radio" name="role" value="restaurateur" {{ old('role') == 'restaurateur' ? 'checked' : '' }} required class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                        <label for="role_restaurateur" class="ms-2 text-sm font-medium text-gray-900">
+                            {{ __('Restaurateur') }}
+                        </label>
+                    </div>
                 </div>
             </div>
 
