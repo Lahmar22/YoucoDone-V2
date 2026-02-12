@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
 use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
     /**
-     * Show the registration form with available roles.
+     * Show the registration form.
      */
     public function show()
     {
-        $roles = Role::all();
-        return view('auth.register', ['roles' => $roles]);
+        return view('auth.register');
     }
 }
