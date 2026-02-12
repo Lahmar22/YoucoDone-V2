@@ -33,15 +33,22 @@
         [x-cloak] { display: none !important; }
         .glass-effect { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
         .menu-card:hover img { transform: scale(1.05); }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(234, 88, 12, 0.4); } 50% { box-shadow: 0 0 40px rgba(234, 88, 12, 0.6); } }
+        .btn-reserve-hero { animation: pulse-glow 2s ease-in-out infinite; }
+        .gradient-overlay { background: linear-gradient(135deg, rgba(234, 88, 12, 0.9) 0%, rgba(116, 75, 162, 0.9) 100%); }
     </style>
 </head>
-<body class="font-sans bg-brand-light text-gray-800 antialiased">
+<body class="font-sans bg-brand-light text-gray-800 antialiased" x-data="{ reservationModal: false }">
 
     <nav class="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <h1 class="font-serif text-2xl font-bold tracking-wide text-brand-dark">
                 Youco<span class="text-brand-orange">Done</span>
             </h1>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="{{ route('client.restaurants') }}" class="text-gray-600 hover:text-brand-orange font-medium transition-colors">Restaurants</a>
+                <a href="{{ route('reservations.index') }}" class="text-gray-600 hover:text-brand-orange font-medium transition-colors">My Reservations</a>
+            </div>
             <div class="flex items-center space-x-4">
                 <a href="{{ route('client.restaurants') }}" class="text-sm font-semibold text-gray-500 hover:text-brand-orange flex items-center gap-2 transition-all">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
@@ -73,36 +80,52 @@
                 <i data-lucide="utensils-crosses" class="text-white/20 w-32 h-32"></i>
             </div>
         @endif
-        <div class="absolute inset-0 bg-gradient-to-t from-brand-dark/90 via-brand-dark/40 to-transparent"></div>
+        <div class="absolute inset-0 gradient-overlay"></div>
         
         <div class="container mx-auto px-6 relative z-10 pb-16">
             <div class="max-w-4xl">
-                <span class="bg-brand-orange text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-4 inline-block">
+                <span class="bg-white/20 backdrop-blur-md text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest mb-6 inline-block border border-white/30">
                     {{ $restaurant->cuisine_type }}
                 </span>
-                <h1 class="font-serif text-5xl md:text-7xl font-bold text-white mb-4">
+                <h1 class="font-serif text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-2xl">
                     {{ $restaurant->name }}
                 </h1>
-                <div class="flex flex-wrap items-center gap-6 text-white/80 font-medium">
-                    <span class="flex items-center gap-2"><i data-lucide="map-pin" class="w-5 h-5 text-brand-orange"></i> {{ $restaurant->location }}</span>
-                    <span class="flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-brand-orange"></i> {{ $restaurant->capacity }} Guests</span>
+                <div class="flex flex-wrap items-center gap-6 text-white/90 font-medium mb-8">
+                    <span class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                        <i data-lucide="map-pin" class="w-5 h-5 text-white"></i> {{ $restaurant->location }}
+                    </span>
+                    <span class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                        <i data-lucide="users" class="w-5 h-5 text-white"></i> {{ $restaurant->capacity }} Guests
+                    </span>
                     @if($restaurant->horaires)
-                        <span class="flex items-center gap-2"><i data-lucide="clock" class="w-5 h-5 text-brand-orange"></i> {{ $restaurant->horaires }}</span>
+                        <span class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                            <i data-lucide="clock" class="w-5 h-5 text-white"></i> {{ $restaurant->horaires }}
+                        </span>
                     @endif
+                </div>
+                <div class="flex flex-wrap gap-4">
+                    <button @click="reservationModal = true" class="btn-reserve-hero inline-flex items-center gap-3 bg-white text-brand-orange font-bold px-8 py-4 rounded-2xl transition-all duration-300 hover:bg-brand-orange hover:text-white shadow-2xl hover:scale-105">
+                        <i data-lucide="calendar-check" class="w-6 h-6"></i>
+                        Reserve Your Table
+                    </button>
+                    <a href="#menus" class="inline-flex items-center gap-3 bg-white/20 backdrop-blur-md text-white border-2 border-white/30 font-bold px-8 py-4 rounded-2xl transition-all duration-300 hover:bg-white hover:text-brand-orange">
+                        <i data-lucide="scroll-text" class="w-5 h-5"></i>
+                        Explore Menus
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <main class="container mx-auto px-6 py-16">
+    <main id="menus" class="container mx-auto px-6 py-16">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
             
             
 
-            <div class="lg:col-span-8">
+            <div class="lg:col-span-12">
                 <div class="flex items-center justify-between mb-10">
                     <h2 class="font-serif text-4xl font-bold text-brand-dark italic">Signature <span class="not-italic text-brand-orange">Menus</span></h2>
-                    <div class="h-px flex-grow mx-8 bg-gray-200 hidden md:block"></div>
+                    <div class="h-px flex-grow mx-8 bg-gradient-to-r from-transparent via-gray-300 to-transparent hidden md:block"></div>
                 </div>
 
                 @if($menus->count() > 0)
@@ -146,6 +169,91 @@
             </div>
         </div>
     </main>
+
+    <!-- Reservation Modal -->
+    <div x-show="reservationModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="reservationModal = false">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" x-show="reservationModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+        
+        <div class="relative bg-white rounded-[2.5rem] shadow-2xl max-w-md w-full overflow-hidden" x-show="reservationModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90">
+            
+            <div class="bg-gradient-to-r from-brand-orange to-red-600 p-8 text-white relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+                <button @click="reservationModal = false" class="absolute top-6 right-6 text-white/80 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <div class="relative">
+                    <i data-lucide="calendar-heart" class="w-12 h-12 mb-4"></i>
+                    <h3 class="font-serif text-3xl font-bold mb-2">Reserve Your Table</h3>
+                    <p class="text-white/90 text-sm">At {{ $restaurant->name }}</p>
+                </div>
+            </div>
+
+            <form action="{{ route('reservations.store') }}" method="POST" class="p-8 space-y-6">
+                @csrf
+                <input type="hidden" name="restaurant_id" value="{{ $restaurant->id }}">
+                
+                @if($errors->any())
+                    <div class="bg-red-50 border-2 border-red-200 text-red-800 px-4 py-3 rounded-xl">
+                        <ul class="text-sm space-y-1">
+                            @foreach($errors->all() as $error)
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="alert-circle" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+                                    <span>{{ $error }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                        <i data-lucide="calendar" class="w-4 h-4 text-brand-orange"></i>
+                        Date
+                    </label>
+                    <input type="date" name="date" required min="{{ date('Y-m-d') }}" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-orange focus:ring-4 focus:ring-orange-100 transition-all outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                        <i data-lucide="clock" class="w-4 h-4 text-brand-orange"></i>
+                        Time
+                    </label>
+                    <input type="time" name="time" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-orange focus:ring-4 focus:ring-orange-100 transition-all outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                        <i data-lucide="users" class="w-4 h-4 text-brand-orange"></i>
+                        Number of Guests
+                    </label>
+                    <select name="number_of_people" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-orange focus:ring-4 focus:ring-orange-100 transition-all outline-none">
+                        <option value="">Select number of guests</option>
+                        @for($i = 1; $i <= 12; $i++)
+                            <option value="{{ $i }}">{{ $i }} {{ $i == 1 ? 'Guest' : 'Guests' }}</option>
+                        @endfor
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                        <i data-lucide="message-square" class="w-4 h-4 text-brand-orange"></i>
+                        Special Requests <span class="text-gray-400 font-normal">(Optional)</span>
+                    </label>
+                    <textarea name="special_request" rows="3" placeholder="Dietary restrictions, celebrations, etc." class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-brand-orange focus:ring-4 focus:ring-orange-100 transition-all outline-none resize-none"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" @click="reservationModal = false" class="flex-1 px-6 py-4 border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-all">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 px-6 py-4 bg-gradient-to-r from-brand-orange to-red-600 text-white font-bold rounded-xl hover:from-red-600 hover:to-brand-orange transition-all shadow-lg flex items-center justify-center gap-2">
+                        <i data-lucide="check" class="w-5 h-5"></i>
+                        Confirm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <footer class="py-12 border-t border-gray-100 text-center text-gray-400 text-sm">
         <p>&copy; 2024 YoucoDone. Crafted for Culinary Excellence.</p>
