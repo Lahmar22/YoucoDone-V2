@@ -6,21 +6,31 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ReservationController extends Controller
 {
-    /**
-     * Display user's reservations.
-     */
+   
     public function index()
     {
-        $reservations = Auth::user()->reservations()
-            ->with('restaurant')
-            ->orderBy('date', 'desc')
-            ->orderBy('time', 'desc')
-            ->get();
+        $reservations = Reservation::with(['restaurant', 'payment'])
+        ->where('user_id', auth()->id())
+        ->orderBy('date', 'desc')
+        ->orderBy('time', 'desc')
+        ->get();
+        
 
         return view('client.reservations.index', compact('reservations'));
+    }
+
+    public function getResevations()
+    {
+        $reservations = DB::table('reservations')->join('restaurants', 'reservations.restaurant_id', '=', 'restaurants.id')
+        ->join('users', 'reservations.user_id', '=', 'users.id')
+        ->where('restaurants.users_id', Auth::id())
+        ->select('reservations.*','restaurants.*', 'users.name')->get();
+
+        return view('restaurateur.reservation', compact('reservations'));
     }
 
     /**
@@ -110,12 +120,26 @@ class ReservationController extends Controller
         }
 
         // All validations passed, create the reservation
-        Reservation::create([
+        $reservation = Reservation::create([
             'user_id' => Auth::id(),
             'restaurant_id' => $validated['restaurant_id'],
             'date' => $validated['date'],
             'time' => $validated['time'],
             'number_of_people' => $validated['number_of_people'],
+        ]);
+
+        // Create notification for restaurant owner
+        \App\Models\Notification::create([
+            'user_id' => $restaurant->users_id,
+            'type' => 'reservation_created',
+            'data' => [
+                'reservation_id' => $reservation->id,
+                'customer_name' => Auth::user()->name,
+                'restaurant_name' => $restaurant->name,
+                'date' => $validated['date'],
+                'time' => $validated['time'],
+                'number_of_people' => $validated['number_of_people'],
+            ],
         ]);
 
         return redirect()->route('reservations.index')
