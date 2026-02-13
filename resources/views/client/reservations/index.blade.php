@@ -90,7 +90,8 @@
     </header>
 
     <main class="container mx-auto px-6 py-16 max-w-6xl">
-        
+
+
         @if(session('success'))
             <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 5000)" x-show="show" x-transition:leave="transition ease-in duration-500" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95" class="bg-green-50 border-2 border-green-200 text-green-800 px-6 py-4 rounded-2xl mb-8 flex items-center gap-3">
                 <i data-lucide="check-circle" class="w-6 h-6 text-green-600"></i>
@@ -102,109 +103,108 @@
         @endif
 
         @if($reservations->count() > 0)
-            <div class="grid grid-cols-1 gap-6">
+            <div class="space-y-8">
                 @foreach($reservations as $reservation)
-                    <div class="reservation-card bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden transition-all duration-300">
-                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 p-8">
+                    <div class="group relative bg-white rounded-[2.5rem] shadow-sm hover:shadow-2xl border border-gray-100 transition-all duration-500 hover:-translate-y-1">
+                        <div class="flex flex-col lg:flex-row overflow-hidden">
                             
-                            <!-- Restaurant Image -->
-                            <div class="md:col-span-3">
-                                <div class="relative h-40 md:h-full rounded-2xl overflow-hidden bg-gray-200">
-                                    @if($reservation->restaurant->image)
-                                        <img src="{{ asset('storage/' . $reservation->restaurant->image) }}" alt="{{ $reservation->restaurant->name }}" class="w-full h-full object-cover">
-                                    @else
-                                        <div class="w-full h-full flex items-center justify-center text-gray-400">
-                                            <i data-lucide="utensils" class="w-12 h-12"></i>
+                            <div class="relative w-full lg:w-80 h-64 lg:h-auto overflow-hidden">
+                                @if($reservation->restaurant->image)
+                                    <img src="{{ asset('storage/' . $reservation->restaurant->image) }}" 
+                                        alt="{{ $reservation->restaurant->name }}" 
+                                        class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                                @else
+                                    <div class="w-full h-full bg-slate-100 flex items-center justify-center">
+                                        <i data-lucide="utensils-crossed" class="w-12 h-12 text-slate-300"></i>
+                                    </div>
+                                @endif
+                                
+                                <div class="absolute top-6 left-6">
+                                    <span class="bg-white/95 backdrop-blur-md text-brand-dark px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-xl">
+                                        {{ $reservation->restaurant->cuisine_type }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex-1 p-8 lg:p-12 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex justify-between items-start mb-6">
+                                        <div>
+                                            <h3 class="font-serif text-3xl font-bold text-brand-dark group-hover:text-brand-orange transition-colors duration-300">
+                                                {{ $reservation->restaurant->name }}
+                                            </h3>
+                                            <p class="flex items-center text-gray-400 text-sm mt-2">
+                                                <i data-lucide="map-pin" class="w-4 h-4 mr-2 text-brand-orange/70"></i>
+                                                {{ $reservation->restaurant->location }}
+                                            </p>
                                         </div>
-                                    @endif
-                                    <div class="absolute top-3 left-3">
-                                        <span class="bg-brand-orange/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold">
-                                            {{ $reservation->restaurant->cuisine_type }}
+
+                                        @php
+                                            $resDate = \Carbon\Carbon::parse($reservation->date);
+                                            $statusClasses = $resDate->isPast() ? 'bg-gray-100 text-gray-500' : ($resDate->isToday() ? 'bg-green-50 text-green-600 border-green-100' : 'bg-orange-50 text-brand-orange border-orange-100');
+                                            $statusText = $resDate->isPast() ? 'Completed' : ($resDate->isToday() ? 'Happening Today' : 'Upcoming');
+                                        @endphp
+                                        <span class="hidden md:block {{ $statusClasses }} px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border">
+                                            {{ $statusText }}
                                         </span>
                                     </div>
-                                </div>
-                            </div>
 
-                            <!-- Reservation Details -->
-                            <div class="md:col-span-6 flex flex-col justify-center">
-                                <h3 class="font-serif text-2xl font-bold text-brand-dark mb-2">
-                                    {{ $reservation->restaurant->name }}
-                                </h3>
-                                <div class="flex items-center text-gray-500 text-sm mb-4">
-                                    <i data-lucide="map-pin" class="w-4 h-4 mr-2 text-brand-orange"></i>
-                                    {{ $reservation->restaurant->location }}
-                                </div>
-                                
-                                <div class="grid grid-cols-3 gap-4">
-                                    <div class="flex items-center gap-2 bg-gray-50 p-3 rounded-xl">
-                                        <i data-lucide="calendar" class="w-5 h-5 text-brand-orange"></i>
-                                        <div>
-                                            <p class="text-xs text-gray-500 font-semibold">Date</p>
-                                            <p class="text-sm font-bold text-brand-dark">{{ \Carbon\Carbon::parse($reservation->date)->format('M d, Y') }}</p>
+                                    <div class="grid grid-cols-2 md:grid-cols-3 gap-8 py-8 border-t border-gray-50">
+                                        <div class="space-y-2">
+                                            <p class="text-[10px] uppercase tracking-[0.15em] text-gray-400 font-bold">Reservation Date</p>
+                                            <p class="text-base font-bold text-brand-dark">{{ \Carbon\Carbon::parse($reservation->date)->format('F d, Y') }}</p>
                                         </div>
-                                    </div>
-                                    <div class="flex items-center gap-2 bg-gray-50 p-3 rounded-xl">
-                                        <i data-lucide="clock" class="w-5 h-5 text-brand-orange"></i>
-                                        <div>
-                                            <p class="text-xs text-gray-500 font-semibold">Time</p>
-                                            <p class="text-sm font-bold text-brand-dark">{{ \Carbon\Carbon::parse($reservation->time)->format('g:i A') }}</p>
+                                        <div class="space-y-2">
+                                            <p class="text-[10px] uppercase tracking-[0.15em] text-gray-400 font-bold">Arrival Time</p>
+                                            <p class="text-base font-bold text-brand-dark">{{ \Carbon\Carbon::parse($reservation->time)->format('g:i A') }}</p>
                                         </div>
-                                    </div>
-                                    <div class="flex items-center gap-2 bg-gray-50 p-3 rounded-xl">
-                                        <i data-lucide="users" class="w-5 h-5 text-brand-orange"></i>
-                                        <div>
-                                            <p class="text-xs text-gray-500 font-semibold">Guests</p>
-                                            <p class="text-sm font-bold text-brand-dark">{{ $reservation->number_of_people }}</p>
+                                        <div class="space-y-2">
+                                            <p class="text-[10px] uppercase tracking-[0.15em] text-gray-400 font-bold">Party Size</p>
+                                            <p class="text-base font-bold text-brand-dark">{{ $reservation->number_of_people }} Guests</p>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Status & Actions -->
-                            <div class="md:col-span-3 flex flex-col justify-center items-end gap-3">
-                                @php
-                                    $reservationDate = \Carbon\Carbon::parse($reservation->date);
-                                    $isPast = $reservationDate->isPast();
-                                    $isToday = $reservationDate->isToday();
-                                    $isUpcoming = $reservationDate->isFuture();
-                                @endphp
+                                <div class="flex flex-col md:flex-row items-center justify-between gap-6 pt-6 border-t border-gray-50">
+                                    <div class="flex items-center gap-4">
+                                        @if($reservation->payment && $reservation->payment->status === 'completed')
+                                            <div class="flex items-center gap-2 text-green-600 font-bold text-xs">
+                                                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                                Payment Confirmed
+                                            </div>
+                                        @else
+                                            <div class="flex items-center gap-2 text-amber-500 font-bold text-xs uppercase tracking-tighter">
+                                                <i data-lucide="info" class="w-4 h-4"></i>
+                                                Pending Settlement
+                                            </div>
+                                        @endif
+                                    </div>
 
-                                @if($isPast)
-                                    <span class="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2 rounded-full text-sm font-bold">
-                                        <i data-lucide="check-circle" class="w-4 h-4"></i>
-                                        Completed
-                                    </span>
-                                @elseif($isToday)
-                                    <span class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-bold">
-                                        <i data-lucide="star" class="w-4 h-4"></i>
-                                        Today!
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-2 bg-orange-100 text-brand-orange px-4 py-2 rounded-full text-sm font-bold">
-                                        <i data-lucide="clock" class="w-4 h-4"></i>
-                                        Upcoming
-                                    </span>
-                                @endif
-
-                                <a href="{{ route('client.restaurant.show', $reservation->restaurant->id) }}" class="inline-flex items-center gap-2 border-2 border-brand-dark text-brand-dark font-bold px-6 py-2 rounded-xl hover:bg-brand-dark hover:text-white transition-all">
-                                    <i data-lucide="eye" class="w-4 h-4"></i>
-                                    View Restaurant
-                                </a>
+                                    <div class="flex items-center gap-4 w-full md:w-auto">
+                                        @if(!$resDate->isPast() && (!$reservation->payment || $reservation->payment->status !== 'completed'))
+                                            <a href="{{ route('payment.create', $reservation->id) }}"
+                                            class="w-full md:w-auto text-center bg-brand-dark text-white px-10 py-4 rounded-2xl font-bold text-sm hover:bg-brand-orange transition-all shadow-xl shadow-gray-200">
+                                                Secure Checkout
+                                            </a>
+                                        @endif
+                                        
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 @endforeach
             </div>
         @else
-            <div class="text-center py-20 bg-white rounded-[3rem] shadow-sm border border-dashed border-gray-200">
-                <div class="bg-orange-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i data-lucide="calendar-x" class="w-12 h-12 text-brand-orange"></i>
+            <div class="text-center py-32 bg-white rounded-[3.5rem] border border-gray-100 shadow-sm">
+                <div class="w-24 h-24 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-8">
+                    <i data-lucide="calendar-days" class="w-10 h-10 text-gray-300"></i>
                 </div>
-                <h3 class="font-serif text-3xl font-bold text-brand-dark mb-3">No Reservations Yet</h3>
-                <p class="text-gray-500 mb-8 max-w-md mx-auto">Start exploring our premium restaurants and make your first reservation!</p>
-                <a href="{{ route('client.restaurants') }}" class="inline-flex items-center gap-2 bg-gradient-to-r from-brand-orange to-red-600 text-white font-bold px-8 py-4 rounded-2xl hover:from-red-600 hover:to-brand-orange transition-all shadow-lg">
-                    <i data-lucide="utensils" class="w-5 h-5"></i>
-                    Explore Restaurants
+                <h3 class="text-3xl font-serif font-bold text-brand-dark mb-3">No Reservations Found</h3>
+                <p class="text-gray-400 mb-10 max-w-sm mx-auto italic">Your upcoming culinary adventures will appear here once you've booked a table.</p>
+                <a href="{{ route('client.restaurants') }}" 
+                class="bg-brand-orange text-white px-10 py-4 rounded-2xl font-bold text-sm shadow-2xl shadow-orange-100 hover:scale-105 transition-transform">
+                    Browse Fine Dining
                 </a>
             </div>
         @endif
