@@ -52,7 +52,7 @@ class LoginController extends Controller
         if ($user->hasRole('client')) {
             return redirect()->route('client.restaurants');
         } elseif ($user->hasRole('restaurateur')) {
-            return redirect()->route('restaurateur.myRestaurant');
+            return redirect()->route('restaurateur.dashboard');
         } elseif ($user->hasRole('admin')) {
             return redirect()->route('admin.dashboard');
         }
