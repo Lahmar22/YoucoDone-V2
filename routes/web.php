@@ -9,6 +9,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\FavorisController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\PaypalController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -32,6 +33,7 @@ Route::get('menu/{menuId}', [ClientController::class, 'showMenu'])->name('client
 Route::get('myRestaurant', [RestaurantController::class, 'myRestaurant'])->name('restaurateur.myRestaurant');
 Route::get('restaurateur/dashboard', [RestaurantController::class, 'dashboard'])->name('restaurateur.dashboard');
 Route::get('myMenu', [MenuController::class, 'myMenu'])->name('restaurateur.myMenu');
+Route::get('restaurateur/reservations', [ReservationController::class, 'getResevations'])->name('restaurateur.reservation');
 
 Route::middleware([
     'auth:sanctum',
@@ -48,6 +50,7 @@ Route::post('restaurants.store', [RestaurantController::class, 'store'])->name('
 Route::delete('restaurants/{restaurant}', [RestaurantController::class, 'destroy'])->name('restaurants.destroy');
 
 Route::put('restaurants/{restaurant}', [RestaurantController::class, 'update'])->name('restaurants.update');
+
 
 Route::get('menus.show/{menu}', [MenuController::class, 'show'])->name('menus.show');
 
@@ -68,6 +71,12 @@ Route::middleware('auth')->group(function () {
     // Reservation Routes
     Route::get('my-reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::post('reservations', [ReservationController::class, 'store'])->name('reservations.store');
+
+    // Notification Routes
+    Route::get('restaurateur/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('restaurateur/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('restaurateur/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.readAll');
+    
 });
 
 
@@ -82,3 +91,13 @@ Route::get('admin/profile', function () {
 Route::get('admin/restaurants', [AdminController::class, 'restaurants'])->name('admin.restaurants');
 
 Route::post('admin/logout', [LoginController::class, 'adminLogout'])->name('admin.logout');
+
+
+Route::get('/payment/{reservation}', [PaypalController::class, 'createPayment'])
+    ->name('payment.create');
+
+Route::get('/payment/success/{reservation}', [PaypalController::class, 'success'])
+    ->name('payment.success');
+
+Route::get('/payment/cancel/{reservation}', [PaypalController::class, 'cancel'])
+    ->name('payment.cancel');
