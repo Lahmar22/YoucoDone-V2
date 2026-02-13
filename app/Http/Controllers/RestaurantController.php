@@ -4,13 +4,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Restaurant;
+use Illuminate\Support\Facades\Auth;    
+use Illuminate\Support\Facades\DB;
 
 class RestaurantController extends Controller
 {
 
     public function dashboard()
     {
-        return view('restaurateur.dashboard');
+        $notifications = auth()->user()
+            ->notifications()
+            ->unread()
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+        $totalreservation = DB::table('reservations')->join('restaurants', 'reservations.restaurant_id', '=', 'restaurants.id')
+        ->where('restaurants.users_id', Auth::id())->count();
+        $totalRestaurant = DB::table('restaurants')->where('users_id', Auth::id())->count();    
+
+        return view('restaurateur.dashboard', compact('notifications', 'totalreservation', 'totalRestaurant'));
     }
 
     public function myRestaurant()
@@ -19,8 +31,8 @@ class RestaurantController extends Controller
         return view('restaurateur.myRestaurant', compact('restaurants'));
     }
 
-    
-     public function destroy(Restaurant $restaurant)
+
+    public function destroy(Restaurant $restaurant)
     {
         $restaurant->delete();
         return redirect()->back()->with('success', 'Restaurant deleted successfully!');
@@ -36,7 +48,7 @@ class RestaurantController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $request->validate([    
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         $fileImage = $request->file('image')->store('images', 'public');
@@ -51,9 +63,9 @@ class RestaurantController extends Controller
             'image' => $fileImage,
             'users_id' => auth()->id(),
         ]);
-        
-      
-        
+
+
+
         return redirect()->back()->with('success', 'Restaurant profile created successfully!');
     }
 }
