@@ -42,6 +42,8 @@
                 <a href="{{ route('restaurateur.dashboard') }}" class="text-brand-orange hover:text-brand-dark font-medium">Home</a>
                 <a href="{{ route('restaurateur.myRestaurant') }}" class="text-brand-orange hover:text-brand-dark font-medium">My Restaurants</a>
                 <a href="{{ route('restaurateur.myMenu') }}" class="text-brand-orange hover:text-brand-dark font-medium">My menu</a>
+                <a href="{{ route('restaurateur.reservation') }}"
+                    class="text-brand-orange hover:text-brand-dark font-medium">Reservations</a>
             </div>
             <div class="flex items-center space-x-4">
                 <div class="relative" x-data="{ open: false }" @click.away="open = false">
